@@ -37,6 +37,25 @@ User.get('/',(req,res,next)=>{
         })
     })
 })
-
+//Fetch Single Task From database
+User.get('/:id', (req, res, next) => {
+    const id = req.params.id
+    userSchema.findById(id).exec().then(user => {
+        if (!user) {
+            return res.status(404).json({
+                message: "Not Found"
+            })
+        }
+         res.status(200).json({
+            message: "Sucess",
+            dat: user
+        })
+    }).catch(err => {
+        res.status(400).json({
+            "message": "error",
+            error: err
+        })
+    })
+})
 
 module.exports = User

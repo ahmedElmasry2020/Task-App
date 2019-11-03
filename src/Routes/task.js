@@ -20,6 +20,41 @@ titleDesc.post('/', (req, res, next) => {
             })
         })
 })
-// fetch Task From DataBase
+// fetch Tasks From DataBase
+titleDesc.get('/', (req, res, next) => {
+    taskSchema.find().exec().then(data => {
+        res.status(200).json({
+            message: "Sucess",
+            dat: data
+        })
+    }).catch(err => {
+        res.status(400).json({
+            "message": "error",
+            error: err
+        })
+    })
+})
+
+//fecth Single Task From DataBase
+
+titleDesc.get('/:id', (req, res, next) => {
+    const id = req.params.id
+    taskSchema.findById(id).exec().then(task => {
+        if (!task) {
+             res.status(404).json({
+                message: "Not Found"
+            })
+        }
+         res.status(200).json({
+            message: "Sucess",
+            dat: task
+        })
+    }).catch(err => {
+        res.status(400).json({
+            "message": "error",
+            error: err
+        })
+    })
+})
 
 module.exports = titleDesc

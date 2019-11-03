@@ -9,5 +9,5 @@ app.listen(port,()=>{
     console.log('app is listen to port'+port);
 })
 
-//app.use('/user',user);
+app.use('/user',user);
 app.use('/task',task);
