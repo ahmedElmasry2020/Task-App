@@ -1,4 +1,6 @@
 const express = require('express');
+const mongoose =require('mongoose');
+
 const titleDesc = express.Router();
 const taskSchema = require('../db/models/task');
 
@@ -54,6 +56,28 @@ titleDesc.get('/:id', (req, res, next) => {
             "message": "error",
             error: err
         })
+    })
+})
+
+
+//update Task 
+titleDesc.patch('/:id', (req, res, next) => {
+    var idd = req.params.id;
+    var id = mongoose.Types.ObjectId(idd);
+    const task = {
+        Title: req.body.title,
+        Description: req.body.desc
+    }
+    taskSchema.updateOne({_id:id},task).exec().then(result => {
+        res.status(200).json({
+            message: "sucess",
+            dat: result
+        })
+    }).catch(err => {
+        res.status(400).json({
+            message: "failed",
+        })
+        console.log(err)
     })
 })
 

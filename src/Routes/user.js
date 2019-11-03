@@ -1,5 +1,6 @@
 const express = require('express');
 const User = express.Router();
+const mongoose =require('mongoose');
 const userSchema = require('../db/models/user');
 // insert user To DataBase
 User.post('/', (req, res, next) => {
@@ -17,23 +18,23 @@ User.post('/', (req, res, next) => {
     }).catch(err => {
         res.status(400).json({
             message: 'can\'t save user',
-            error:err.toString()
+            error: err.toString()
         })
     })
 
 })
 
 //fetch Users From DataBase
-User.get('/',(req,res,next)=>{
-    userSchema.find().exec().then(data=>{
+User.get('/', (req, res, next) => {
+    userSchema.find().exec().then(data => {
         res.status(200).json({
-            message:"Sucess",
-            dat:data
+            message: "Sucess",
+            dat: data
         })
-    }).catch(err=>{
+    }).catch(err => {
         res.status(400).json({
-            "message":"error",
-            error:err
+            "message": "error",
+            error: err
         })
     })
 })
@@ -46,7 +47,7 @@ User.get('/:id', (req, res, next) => {
                 message: "Not Found"
             })
         }
-         res.status(200).json({
+        res.status(200).json({
             message: "Sucess",
             dat: user
         })
@@ -57,5 +58,29 @@ User.get('/:id', (req, res, next) => {
         })
     })
 })
+
+//update user 
+User.patch('/:id', (req, res, next) => {
+    var idd = req.params.id;
+    var id = mongoose.Types.ObjectId(idd);
+    const user = {
+        name: req.body.name,
+        age: req.body.age,
+        email: req.body.email,
+        password: req.body.password
+    }
+    userSchema.updateOne({_id:id},user).exec().then(result => {
+        res.status(200).json({
+            message: "sucess",
+            dat: result
+        })
+    }).catch(err => {
+        res.status(400).json({
+            message: "failed",
+        })
+        console.log(err)
+    })
+})
+
 
 module.exports = User
