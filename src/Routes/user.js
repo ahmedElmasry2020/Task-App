@@ -63,13 +63,8 @@ User.get('/:id', (req, res, next) => {
 User.patch('/:id', (req, res, next) => {
     var idd = req.params.id;
     var id = mongoose.Types.ObjectId(idd);
-    const user = {
-        name: req.body.name,
-        age: req.body.age,
-        email: req.body.email,
-        password: req.body.password
-    }
-    userSchema.updateOne({_id:id},user).exec().then(result => {
+    
+    userSchema.updateOne({_id:id},req.body,{ runValidators: true }).exec().then(result => {
         res.status(200).json({
             message: "sucess",
             dat: result
@@ -82,5 +77,23 @@ User.patch('/:id', (req, res, next) => {
     })
 })
 
+//Delete User
+User.delete('/:id',(req,res,next)=>{
+    const idd =req.params.id;
+    var id = mongoose.Types.ObjectId(idd);
+  
+    userSchema.deleteOne({_id:id}).exec().then(result=>{
+      res.status(200).json({
+          message:"Sucess",
+          resu:result
+      })
+    }).catch(err=>{
+        res.status(400).json({
+            message:"Error",
+            er:err
+        })
+    })
+  })
+  
 
 module.exports = User

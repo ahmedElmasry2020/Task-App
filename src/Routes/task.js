@@ -38,7 +38,6 @@ titleDesc.get('/', (req, res, next) => {
 })
 
 //fecth Single Task From DataBase
-
 titleDesc.get('/:id', (req, res, next) => {
     const id = req.params.id
     taskSchema.findById(id).exec().then(task => {
@@ -59,7 +58,6 @@ titleDesc.get('/:id', (req, res, next) => {
     })
 })
 
-
 //update Task 
 titleDesc.patch('/:id', (req, res, next) => {
     var idd = req.params.id;
@@ -68,7 +66,7 @@ titleDesc.patch('/:id', (req, res, next) => {
         Title: req.body.title,
         Description: req.body.desc
     }
-    taskSchema.updateOne({_id:id},task).exec().then(result => {
+    taskSchema.updateOne({_id:id},req.body,{ runValidators: true }).exec().then(result => {
         res.status(200).json({
             message: "sucess",
             dat: result
@@ -80,5 +78,24 @@ titleDesc.patch('/:id', (req, res, next) => {
         console.log(err)
     })
 })
+
+//Delete Single Task
+titleDesc.delete('/:id',(req,res,next)=>{
+  const idd =req.params.id;
+  var id = mongoose.Types.ObjectId(idd);
+
+  taskSchema.deleteOne({_id:id}).exec().then(result=>{
+    res.status(200).json({
+        message:"Sucess",
+        resu:result
+    })
+  }).catch(err=>{
+      res.status(400).json({
+          message:"Error",
+          er:err
+      })
+  })
+})
+
 
 module.exports = titleDesc
