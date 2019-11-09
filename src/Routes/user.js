@@ -1,7 +1,9 @@
 const express = require('express');
 const User = express.Router();
-const mongoose =require('mongoose');
+const mongoose = require('mongoose');
 const userSchema = require('../db/models/user');
+const bycrpt = require('bcryptjs');
+
 // insert user To DataBase
 User.post('/', (req, res, next) => {
     const user = new userSchema({
@@ -63,8 +65,8 @@ User.get('/:id', (req, res, next) => {
 User.patch('/:id', (req, res, next) => {
     var idd = req.params.id;
     var id = mongoose.Types.ObjectId(idd);
-    
-    userSchema.updateOne({_id:id},req.body,{ runValidators: true }).exec().then(result => {
+
+    userSchema.updateOne({ _id: id }, req.body, { runValidators: true }).exec().then(result => {
         res.status(200).json({
             message: "sucess",
             dat: result
@@ -78,22 +80,64 @@ User.patch('/:id', (req, res, next) => {
 })
 
 //Delete User
-User.delete('/:id',(req,res,next)=>{
-    const idd =req.params.id;
+User.delete('/:id', (req, res, next) => {
+    const idd = req.params.id;
     var id = mongoose.Types.ObjectId(idd);
-  
-    userSchema.deleteOne({_id:id}).exec().then(result=>{
-      res.status(200).json({
-          message:"Sucess",
-          resu:result
-      })
-    }).catch(err=>{
+
+    userSchema.deleteOne({ _id: id }).exec().then(result => {
+        res.status(200).json({
+            message: "Sucess",
+            resu: result
+        })
+    }).catch(err => {
         res.status(400).json({
-            message:"Error",
-            er:err
+            message: "Error",
+            er: err
         })
     })
-  })
-  
+})
+
+
+//User login
+
+// User.post('/login', async (req, res) => {
+//     const userLogin = {
+//         email: req.body.email,
+//         password: req.body.pass
+//     }
+//     const user = await userSchema.finByCredentials(userLogin.email, userLogin.password);
+//     if (user) {
+//         res.status(201).json({
+//             message: "success",
+//             user: user
+//         })
+//     }
+//     else{
+//         res.status(400).json({
+//             message: "wrong",
+//         })
+//     }
+// })
+
+User.post('/login', async (req, res) => {
+   // try {
+       const email =req.body.email;
+       const password =req.body.password;
+       userSchema.findOne({email:email}).exec().then(user=>{
+           if(!user){
+               throw new Error('unable to login');
+           }
+           bycrpt.compare(password, user.password).then(checkPass=>{
+            if(!checkPass){
+                throw new Error('uncorrect Password');
+            }
+            res.status(201).json({
+                mesaage:"Success",
+                data:user
+            })
+           });    
+       })
+})
+
 
 module.exports = User
