@@ -3,7 +3,7 @@ const validator = require('validator');
 const dbConnect = require('../mongooseConnect');
 const Schema = mongoose.Schema
 const bycrpt = require('bcryptjs');
-
+const jwt = require('jsonwebtoken');
 dbConnect()
 
 const userSchema = new Schema({
@@ -24,6 +24,7 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
         validate(value) {
             if (!validator.isEmail(value)) {
                 throw Error('invalid email format');
@@ -42,25 +43,42 @@ const userSchema = new Schema({
                 throw Error('length shoul be longer than 6')
             }
         }
-    }
+    },
+    tokens: [
+        {
+            token: {
+                type: String,
+                required:true
+            }
+
+        }
+    ]
 });
 
-userSchema.statics.findByCredentials = async (email, password) => {
-    const use = await user.findOne({ email:email });
-    console.log(use);
-    if (!use) {
-        throw new Error('unable to login');
-    }
-    else {
-        const checkpass = await bycrpt.compare(password, use.password);
-        if (!checkpass) {
-            throw new Error('uncorrect password');
-        }
-        else {
-            return use;
-        }
-    }
+userSchema.methods.generateAuth = async function () {
+    const user = this;
+    console.log(user);
+    const token =   jwt.sign({ _id: user._id }, 'secret');
+    user.tokens =  user.tokens.concat({token})
+     user.save()
+    return token;
 }
+// userSchema.statics.findByCredentials = async (email, password) => {
+//     const use = await user.findOne({ email: email });
+//     console.log(use);
+//     if (!use) {
+//         throw new Error('unable to login');
+//     }
+//     else {
+//         const checkpass = await bycrpt.compare(password, use.password);
+//         if (!checkpass) {
+//             throw new Error('uncorrect password');
+//         }
+//         else {
+//             return use;
+//         }
+//     }
+// }
 userSchema.pre('save', async function (next) {
     const user = this;
     console.log('just before saving');

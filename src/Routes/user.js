@@ -120,23 +120,40 @@ User.delete('/:id', (req, res, next) => {
 // })
 
 User.post('/login', async (req, res) => {
-   // try {
-       const email =req.body.email;
-       const password =req.body.password;
-       userSchema.findOne({email:email}).exec().then(user=>{
-           if(!user){
-               throw new Error('unable to login');
-           }
-           bycrpt.compare(password, user.password).then(checkPass=>{
-            if(!checkPass){
-                throw new Error('uncorrect Password');
-            }
-            res.status(201).json({
-                mesaage:"Success",
-                data:user
+    // try {
+    const email = req.body.email;
+    const password = req.body.password;
+    userSchema.findOne({ email: email }).exec().then(user => {
+try{
+        if (!user) {
+            res.status(400).json({
+                message:"no user for this email"
             })
-           });    
-       })
+            throw new Error('unable to login');
+        }
+    }
+    catch(e){console.log(e)}
+        bycrpt.compare(password, user.password).then(checkPass => {
+            try {
+                if (!checkPass) {
+                    res.status(400).json({
+                        message:"wrong password"
+                    })
+                    throw new Error('uncorrect Password');
+                }
+                //console.log(user.generateAuth());
+                user.generateAuth().then(token=>{
+                    console.log(token)
+                    res.status(201).json({
+                        mesaage: "Success",
+                        data: user,
+                        token:token
+                    })
+                });
+                
+            } catch (e) { console.log(e) }
+        });
+    })
 })
 
 
