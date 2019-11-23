@@ -15,6 +15,10 @@ const titleDescSchema = new Schema({
         type: String,
         trim: true,
         required: true
+    },
+    owner:{
+        type:Schema.Types.ObjectId,
+        required:true
     }
 })
 const titleDesc = mongoose.model('TitleDesc', titleDescSchema);
