@@ -20,6 +20,8 @@ const titleDescSchema = new Schema({
         type:Schema.Types.ObjectId,
         required:true
     }
+},{
+    timestamps:true
 })
 const titleDesc = mongoose.model('TitleDesc', titleDescSchema);
 

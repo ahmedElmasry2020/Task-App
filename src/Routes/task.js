@@ -24,8 +24,12 @@ titleDesc.post('/', auth,(req, res, next) => {
         })
 })
 // fetch Tasks From DataBase
+//tasks?limit=5?skip=1
 titleDesc.get('/',auth, (req, res, next) => {
-    taskSchema.find({owner:req.user._id}).exec().then(data => {
+    const completedCheck=req.query.completed;
+    const limit =req.query.limit;
+    const skip =req.query.skip;
+    taskSchema.find({owner:req.user._id}).limit(parseInt(limit)).skip(parseInt(skip)).exec().then(data => {
         res.status(200).json({
             message: "Sucess",
             dat: data

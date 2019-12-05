@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const dbConnect = require('../mongooseConnect');
+const task = require('./task');
 const Schema = mongoose.Schema
 const bycrpt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -53,6 +54,8 @@ const userSchema = new Schema({
 
         }
     ]
+},{
+    timestamps:true
 });
 
 userSchema.methods.generateAuth = async function () {
@@ -86,6 +89,11 @@ userSchema.pre('save', async function (next) {
         user.password = await bycrpt.hash(user.password, 8)
     }
     next()
+})
+userSchema.pre('delete',async function(){
+    const user = this;
+    await task.deleteMany({owner:user._id})
+    next();
 })
 const user = mongoose.model('user', userSchema);
 
