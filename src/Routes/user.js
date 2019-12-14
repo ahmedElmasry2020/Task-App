@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bycrpt = require('bcryptjs');
 const userSchema = require('../db/models/user');
 const auth = require('../middleware/auth');
+const senEmail =require('../emails/account');
 // insert user To DataBase
 User.post('/', (req, res, next) => {
     const user = new userSchema({
@@ -31,7 +32,7 @@ User.post('/', (req, res, next) => {
             error: err.toString()
         })
     })
-
+    senEmail(user);
 })
 
 //fetch Users From DataBase auth,
